@@ -1,0 +1,261 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Flujo · Creación de empresa y configuración por sector",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "alta",
+        "label": "Alta legal",
+        "focus": [
+          "inicia",
+          "sector",
+          "catalogo"
+        ],
+        "note": "El sector económico determina qué catálogo global se aplica a la empresa."
+      },
+      {
+        "id": "carga",
+        "label": "Carga del sector",
+        "focus": [
+          "catalogo",
+          "cargaPeligros",
+          "habilitaAgentes"
+        ],
+        "note": "Peligros típicos y agentes recomendados llegan desde el catálogo del ramo."
+      },
+      {
+        "id": "equipo",
+        "label": "Equipo y matriz",
+        "focus": [
+          "responsable",
+          "colaboradores",
+          "matriz"
+        ],
+        "note": "La matriz inicial solo se genera con responsable SG-SST asignado."
+      }
+    ],
+    "viewBox": [
+      1240,
+      652
+    ]
+  },
+  "lanes": [
+    {
+      "id": "admin",
+      "label": "Administrador de Empresa"
+    },
+    {
+      "id": "companySvc",
+      "label": "Company Service"
+    },
+    {
+      "id": "iaOrq",
+      "label": "AI Orchestrator"
+    },
+    {
+      "id": "motor",
+      "label": "SG-SST Engine"
+    }
+  ],
+  "phases": [
+    {
+      "id": "alta",
+      "label": "Alta",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "config",
+      "label": "Configuración por sector",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "arranque",
+      "label": "Arranque",
+      "fromCol": 4,
+      "toCol": 4,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "inicia",
+    "sector",
+    "cargaPeligros",
+    "habilitaAgentes",
+    "matriz"
+  ],
+  "nodes": [
+    {
+      "id": "inicia",
+      "lane": "admin",
+      "col": 0,
+      "type": "frontend",
+      "label": "Crear empresa",
+      "sublabel": "NIT y razón social",
+      "width": 125
+    },
+    {
+      "id": "sector",
+      "lane": "admin",
+      "col": 1,
+      "type": "frontend",
+      "label": "Elegir sector",
+      "sublabel": "construcción…",
+      "width": 125
+    },
+    {
+      "id": "catalogo",
+      "lane": "companySvc",
+      "col": 0,
+      "type": "cloud",
+      "label": "Catálogo sector",
+      "sublabel": "peligros típicos",
+      "width": 125
+    },
+    {
+      "id": "cargaPeligros",
+      "lane": "companySvc",
+      "col": 2,
+      "type": "backend",
+      "label": "Cargar peligros",
+      "sublabel": "base del ramo",
+      "width": 125
+    },
+    {
+      "id": "habilitaAgentes",
+      "lane": "iaOrq",
+      "col": 3,
+      "type": "cloud",
+      "label": "Habilitar agentes",
+      "sublabel": "según sector",
+      "width": 125
+    },
+    {
+      "id": "responsable",
+      "lane": "admin",
+      "col": 3,
+      "type": "security",
+      "label": "Asignar SG-SST",
+      "sublabel": "responsable legal",
+      "width": 125
+    },
+    {
+      "id": "colaboradores",
+      "lane": "companySvc",
+      "col": 4,
+      "type": "backend",
+      "label": "Cargar equipo",
+      "sublabel": "colaboradores",
+      "width": 125
+    },
+    {
+      "id": "matriz",
+      "lane": "motor",
+      "col": 4,
+      "type": "database",
+      "label": "Matriz inicial",
+      "sublabel": "peligro x proceso",
+      "width": 125
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "inicia",
+      "to": "sector",
+      "label": "datos legales",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e2",
+      "from": "sector",
+      "to": "cargaPeligros",
+      "label": "codigoSector",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e3",
+      "from": "cargaPeligros",
+      "to": "habilitaAgentes",
+      "label": "sector listo",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e4",
+      "from": "habilitaAgentes",
+      "to": "matriz",
+      "label": "agentes activos",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e5",
+      "from": "catalogo",
+      "to": "cargaPeligros",
+      "label": "peligros base",
+      "role": "branch"
+    },
+    {
+      "id": "e6",
+      "from": "cargaPeligros",
+      "to": "responsable",
+      "label": "exige titular",
+      "variant": "security",
+      "role": "branch"
+    },
+    {
+      "id": "e7",
+      "from": "responsable",
+      "to": "colaboradores",
+      "label": "define equipo",
+      "role": "branch"
+    },
+    {
+      "id": "e8",
+      "from": "colaboradores",
+      "to": "matriz",
+      "label": "nómina",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Configuración por sector",
+      "items": [
+        "codigoSector decide peligros y matriz legal",
+        "modelos_negocio fija requisitos por defecto",
+        "El tamaño de empresa ajusta las obligaciones"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Agentes recomendados",
+      "items": [
+        "El catálogo sugiere qué agentes habilitar",
+        "El Admin puede desactivar cualquiera de ellos",
+        "La config queda en config_agentes_ia"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Matriz inicial",
+      "items": [
+        "Se genera precargada, nunca vacía",
+        "Cada peligro queda pendiente de validación",
+        "Requiere responsable SG-SST asignado"
+      ]
+    }
+  ]
+}

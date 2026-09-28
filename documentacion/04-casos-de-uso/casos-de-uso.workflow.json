@@ -1,0 +1,335 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Casos de uso por actor",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "plataforma",
+        "label": "Plataforma",
+        "focus": [
+          "crearRol",
+          "permisos",
+          "configIA"
+        ],
+        "note": "El Súper Administrador define el catálogo RBAC que consumen todas las empresas."
+      },
+      {
+        "id": "planificacion",
+        "label": "Planificación SG-SST",
+        "focus": [
+          "politica",
+          "peligros",
+          "riesgos",
+          "planAnual"
+        ],
+        "note": "Recorrido del Gerente SG-SST por política, peligros, riesgos y plan anual."
+      },
+      {
+        "id": "consumo",
+        "label": "Consulta y seguimiento",
+        "focus": [
+          "verDocs",
+          "verPeligros",
+          "alertas"
+        ],
+        "note": "Lo que trabajadores y alta dirección consumen del sistema."
+      }
+    ],
+    "viewBox": [
+      1240,
+      776
+    ]
+  },
+  "lanes": [
+    {
+      "id": "superAdmin",
+      "label": "Súper Administrador"
+    },
+    {
+      "id": "adminEmpresa",
+      "label": "Administrador de Empresa"
+    },
+    {
+      "id": "gerente",
+      "label": "Gerente SG-SST"
+    },
+    {
+      "id": "agentes",
+      "label": "Sistema · Agentes de IA"
+    },
+    {
+      "id": "trabajador",
+      "label": "Trabajador y contratista"
+    }
+  ],
+  "mainPath": [
+    "crearEmpresa",
+    "asignarSector",
+    "configIA",
+    "politica",
+    "peligros",
+    "riesgos",
+    "planAnual"
+  ],
+  "nodes": [
+    {
+      "id": "crearRol",
+      "lane": "superAdmin",
+      "col": 0,
+      "type": "security",
+      "label": "Crear rol",
+      "sublabel": "catálogo global",
+      "width": 118
+    },
+    {
+      "id": "permisos",
+      "lane": "superAdmin",
+      "col": 1,
+      "type": "security",
+      "label": "Dar permisos",
+      "sublabel": "recurso y acción",
+      "width": 118
+    },
+    {
+      "id": "crearEmpresa",
+      "lane": "adminEmpresa",
+      "col": 0,
+      "type": "frontend",
+      "label": "Crear empresa",
+      "sublabel": "NIT y razón",
+      "width": 118
+    },
+    {
+      "id": "asignarSector",
+      "lane": "adminEmpresa",
+      "col": 1,
+      "type": "frontend",
+      "label": "Asignar sector",
+      "sublabel": "modelo negocio",
+      "width": 118
+    },
+    {
+      "id": "configIA",
+      "lane": "adminEmpresa",
+      "col": 2,
+      "type": "cloud",
+      "label": "Configurar IA",
+      "sublabel": "agentes activos",
+      "width": 118
+    },
+    {
+      "id": "politica",
+      "lane": "gerente",
+      "col": 2,
+      "type": "backend",
+      "label": "Crear política",
+      "sublabel": "asistida por IA",
+      "width": 118
+    },
+    {
+      "id": "peligros",
+      "lane": "gerente",
+      "col": 3,
+      "type": "backend",
+      "label": "Mapear peligros",
+      "sublabel": "por actividad",
+      "width": 118
+    },
+    {
+      "id": "riesgos",
+      "lane": "gerente",
+      "col": 4,
+      "type": "backend",
+      "label": "Evaluar riesgos",
+      "sublabel": "prob. x impacto",
+      "width": 118
+    },
+    {
+      "id": "planAnual",
+      "lane": "gerente",
+      "col": 5,
+      "type": "backend",
+      "label": "Plan anual",
+      "sublabel": "11 módulos",
+      "width": 118
+    },
+    {
+      "id": "normativo",
+      "lane": "agentes",
+      "col": 2,
+      "type": "external",
+      "label": "Agente Legal",
+      "sublabel": "vigila normas",
+      "width": 118
+    },
+    {
+      "id": "agPeligros",
+      "lane": "agentes",
+      "col": 3,
+      "type": "external",
+      "label": "Agente Peligros",
+      "sublabel": "sugiere y valida",
+      "width": 118
+    },
+    {
+      "id": "alertas",
+      "lane": "agentes",
+      "col": 5,
+      "type": "messagebus",
+      "label": "Enviar alertas",
+      "sublabel": "y recordatorios",
+      "width": 118
+    },
+    {
+      "id": "verDocs",
+      "lane": "trabajador",
+      "col": 4,
+      "type": "frontend",
+      "label": "Ver documentos",
+      "sublabel": "política y plan",
+      "width": 118
+    },
+    {
+      "id": "verPeligros",
+      "lane": "trabajador",
+      "col": 5,
+      "type": "frontend",
+      "label": "Ver peligros",
+      "sublabel": "y sus controles",
+      "width": 118
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "crearRol",
+      "to": "permisos",
+      "label": "define",
+      "role": "branch"
+    },
+    {
+      "id": "e2",
+      "from": "permisos",
+      "to": "configIA",
+      "label": "catálogo RBAC",
+      "role": "branch"
+    },
+    {
+      "id": "e3",
+      "from": "crearEmpresa",
+      "to": "asignarSector",
+      "label": "datos legales",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e4",
+      "from": "asignarSector",
+      "to": "configIA",
+      "label": "sector fijado",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e5",
+      "from": "configIA",
+      "to": "politica",
+      "label": "agentes listos",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e6",
+      "from": "politica",
+      "to": "peligros",
+      "label": "aprobada",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e7",
+      "from": "peligros",
+      "to": "riesgos",
+      "label": "registrado",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e8",
+      "from": "riesgos",
+      "to": "planAnual",
+      "label": "valorado",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e9",
+      "from": "normativo",
+      "to": "politica",
+      "label": "marco legal",
+      "role": "branch"
+    },
+    {
+      "id": "e10",
+      "from": "agPeligros",
+      "to": "peligros",
+      "label": "del sector",
+      "role": "branch"
+    },
+    {
+      "id": "e11",
+      "from": "politica",
+      "to": "verDocs",
+      "label": "publicada",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "e12",
+      "from": "riesgos",
+      "to": "verPeligros",
+      "label": "controles",
+      "variant": "dashed",
+      "role": "async"
+    },
+    {
+      "id": "e13",
+      "from": "planAnual",
+      "to": "alertas",
+      "label": "recordatorios",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Reglas de actor",
+      "items": [
+        "Valida rol y empresaId",
+        "El Admin no edita datos SG-SST"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Asistencia de IA",
+      "items": [
+        "Los agentes proponen, no deciden",
+        "El borrador lo aprueba el Gerente"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Trazabilidad",
+      "items": [
+        "Todo deja registro de auditoría",
+        "Las alertas nacen del plan anual"
+      ]
+    }
+  ]
+}

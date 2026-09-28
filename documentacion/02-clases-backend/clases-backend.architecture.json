@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Clases backend · modelo de dominio Node.js",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1340,
+      715
+    ],
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "acceso",
+        "label": "Identidad y permisos",
+        "focus": [
+          "user",
+          "role",
+          "permission"
+        ],
+        "note": "Un rol agrupa permisos atómicos de recurso y acción; el usuario hereda por asignación."
+      },
+      {
+        "id": "organizacion",
+        "label": "Organización",
+        "focus": [
+          "user",
+          "collaborator",
+          "company",
+          "department"
+        ],
+        "note": "Collaborator resuelve la pertenencia N:M entre usuario y empresa."
+      },
+      {
+        "id": "catalogos",
+        "label": "Catálogos de empresa",
+        "focus": [
+          "company",
+          "sector",
+          "businessModel",
+          "companySize"
+        ],
+        "note": "Tres catálogos globales parametrizan la configuración de cada empresa."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "permission",
+      "type": "security",
+      "label": "Permission",
+      "sublabel": "recurso · accion",
+      "tag": "+ describe()",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "role",
+      "type": "security",
+      "label": "Role",
+      "sublabel": "nombre · permisos[]",
+      "tag": "+ assignPermissions()",
+      "pos": [
+        300,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "department",
+      "type": "backend",
+      "label": "Department",
+      "sublabel": "responsable · supervisor",
+      "tag": "+ listByCompany()",
+      "pos": [
+        560,
+        60
+      ],
+      "size": [
+        180,
+        70
+      ]
+    },
+    {
+      "id": "user",
+      "type": "backend",
+      "label": "User",
+      "sublabel": "email · password_hash",
+      "tag": "+ assignRole()",
+      "pos": [
+        40,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "collaborator",
+      "type": "backend",
+      "label": "Collaborator",
+      "sublabel": "cargo · departamento",
+      "tag": "+ addCollaborator()",
+      "pos": [
+        300,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "company",
+      "type": "backend",
+      "label": "Company",
+      "sublabel": "nit · razonSocial",
+      "tag": "+ getSector()",
+      "pos": [
+        560,
+        220
+      ],
+      "size": [
+        180,
+        90
+      ]
+    },
+    {
+      "id": "sector",
+      "type": "cloud",
+      "label": "Sector",
+      "sublabel": "peligros_tipicos[]",
+      "tag": "catálogo global",
+      "pos": [
+        840,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "businessModel",
+      "type": "cloud",
+      "label": "BusinessModel",
+      "sublabel": "requisitos_por_defecto",
+      "tag": "catálogo global",
+      "pos": [
+        300,
+        400
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "companySize",
+      "type": "cloud",
+      "label": "CompanySize",
+      "sublabel": "rango_empleados",
+      "tag": "catálogo global",
+      "pos": [
+        560,
+        400
+      ],
+      "size": [
+        180,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "Control de acceso · RBAC",
+      "wraps": [
+        "permission",
+        "role"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Agregado de organización · raíz Company",
+      "wraps": [
+        "company",
+        "collaborator",
+        "department"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "role-permission",
+      "from": "role",
+      "to": "permission",
+      "label": "1 : N"
+    },
+    {
+      "id": "user-role",
+      "from": "user",
+      "to": "role",
+      "label": "N : M",
+      "variant": "security"
+    },
+    {
+      "id": "user-collaborator",
+      "from": "user",
+      "to": "collaborator",
+      "label": "1 : N",
+      "variant": "emphasis",
+      "labelDy": 20
+    },
+    {
+      "id": "collaborator-company",
+      "from": "collaborator",
+      "to": "company",
+      "label": "N : 1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "company-department",
+      "from": "company",
+      "to": "department",
+      "label": "1 : N",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "company-sector",
+      "from": "company",
+      "to": "sector",
+      "label": "N : 1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "company-size",
+      "from": "company",
+      "to": "companySize",
+      "label": "N : 1",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "company-model",
+      "from": "company",
+      "to": "businessModel",
+      "label": "N : 1"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Capas MVC por entidad",
+      "items": [
+        "Controller: valida request y códigos HTTP",
+        "Service: regla de negocio y criptografía",
+        "Repository: única capa que toca MongoDB"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Relaciones clave",
+      "items": [
+        "Collaborator resuelve el N:M User-Company",
+        "Collaborator.departamento apunta a Department",
+        "Role puede ser global o propio de una empresa"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Código limpio",
+      "items": [
+        "Una responsabilidad por clase (SRP)",
+        "Repositorios detrás de interfaz (DIP)",
+        "Validación en controller, service y esquema"
+      ]
+    }
+  ]
+}

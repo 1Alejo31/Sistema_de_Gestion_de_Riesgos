@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Modelo de datos MongoDB · 14 colecciones",
+    "quality_profile": "showcase",
+    "viewBox": [1340, 715],
+    "legend": { "mode": "all" },
+    "views": [
+      {
+        "id": "identidad",
+        "label": "Identidad y acceso",
+        "focus": ["usuarios", "roles", "colaboradores", "empresas"],
+        "note": "Usuario y Empresa se relacionan N:M mediante colaboradores; roles definen permisos."
+      },
+      {
+        "id": "planificacion",
+        "label": "Planificación SG-SST",
+        "focus": ["empresas", "matriz", "evaluacion", "programas"],
+        "note": "Cadena de peligro identificado a riesgo valorado y su programa de gestión."
+      },
+      {
+        "id": "catalogos",
+        "label": "Catálogos y agentes",
+        "focus": ["sectores", "modelos", "configAgentes", "empresas"],
+        "note": "Catálogos globales que parametrizan los agentes de IA de cada empresa."
+      }
+    ]
+  },
+  "components": [
+    { "id": "politicas", "type": "database", "label": "politicas_sgsst", "sublabel": "version · estado", "tag": "empresaId", "pos": [560, 60], "size": [180, 70] },
+    { "id": "documentos", "type": "database", "label": "documentos", "sublabel": "tipo · version", "tag": "aprobadores[]", "pos": [840, 60], "size": [170, 70] },
+    { "id": "auditoria", "type": "security", "label": "registro_auditoria", "sublabel": "accion · timestamp", "tag": "inmutable", "pos": [1120, 60], "size": [170, 70] },
+
+    { "id": "usuarios", "type": "database", "label": "usuarios", "sublabel": "email · password_hash", "tag": "global", "pos": [40, 230], "size": [170, 70] },
+    { "id": "colaboradores", "type": "database", "label": "colaboradores", "sublabel": "cargo · departamento", "tag": "usuarioId", "pos": [300, 230], "size": [170, 70] },
+    { "id": "empresas", "type": "database", "label": "empresas", "sublabel": "nit · sector · tamaño", "tag": "raíz del tenant", "pos": [560, 220], "size": [180, 90] },
+    { "id": "matriz", "type": "database", "label": "matriz_peligros", "sublabel": "proceso · tipoPeligro", "tag": "empresaId", "pos": [840, 230], "size": [170, 70] },
+    { "id": "evaluacion", "type": "database", "label": "evaluacion_riesgos", "sublabel": "probabilidad · impacto", "tag": "peligroId", "pos": [1120, 230], "size": [170, 70] },
+
+    { "id": "roles", "type": "security", "label": "roles", "sublabel": "permisos[] · predefinido", "tag": "empresa_id", "pos": [40, 400], "size": [170, 70] },
+    { "id": "departamentos", "type": "database", "label": "departamentos", "sublabel": "responsable · peligros[]", "tag": "empresaId", "pos": [300, 400], "size": [170, 70] },
+    { "id": "configAgentes", "type": "database", "label": "config_agentes_ia", "sublabel": "tipoAgente · modelo", "tag": "empresaId", "pos": [560, 400], "size": [180, 70] },
+    { "id": "programas", "type": "database", "label": "programas", "sublabel": "objetivo · meta", "tag": "responsable", "pos": [1120, 400], "size": [170, 70] },
+
+    { "id": "sectores", "type": "cloud", "label": "sectores", "sublabel": "peligros_tipicos[]", "tag": "catálogo global", "pos": [300, 570], "size": [170, 70] },
+    { "id": "modelos", "type": "cloud", "label": "modelos_negocio", "sublabel": "requisitos_por_defecto", "tag": "catálogo global", "pos": [560, 570], "size": [180, 70] }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Alcance del arrendatario · empresaId presente en toda colección",
+      "wraps": ["colaboradores", "empresas", "departamentos", "politicas", "documentos", "auditoria", "matriz", "evaluacion", "programas", "configAgentes"]
+    }
+  ],
+  "connections": [
+    { "id": "usuarios-roles", "from": "usuarios", "to": "roles", "label": "N : M", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "usuarios-colaboradores", "from": "usuarios", "to": "colaboradores", "label": "1 : N", "variant": "emphasis" },
+    { "id": "colaboradores-empresas", "from": "colaboradores", "to": "empresas", "label": "N : 1", "variant": "emphasis" },
+    { "id": "colaboradores-departamentos", "from": "colaboradores", "to": "departamentos", "label": "N : 1", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+
+    { "id": "empresas-politicas", "from": "empresas", "to": "politicas", "label": "1 : N versiones", "fromSide": "top", "toSide": "bottom" },
+    { "id": "politicas-documentos", "from": "politicas", "to": "documentos", "label": "1 : 1 publicada" },
+    { "id": "documentos-auditoria", "from": "documentos", "to": "auditoria", "label": "1 : N" },
+
+    { "id": "empresas-matriz", "from": "empresas", "to": "matriz", "label": "1 : N", "variant": "emphasis" },
+    { "id": "matriz-evaluacion", "from": "matriz", "to": "evaluacion", "label": "1 : N", "variant": "emphasis" },
+    { "id": "evaluacion-programas", "from": "evaluacion", "to": "programas", "label": "N : 1", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+
+    { "id": "empresas-config", "from": "empresas", "to": "configAgentes", "label": "1 : N agentes", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "sectores-config", "from": "sectores", "to": "configAgentes", "label": "recomienda" },
+    { "id": "modelos-config", "from": "modelos", "to": "configAgentes", "label": "requisitos base", "fromSide": "top", "toSide": "bottom" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Catálogos globales",
+      "items": [
+        "usuarios y roles viven fuera del tenant",
+        "sectores aporta peligros típicos del ramo",
+        "modelos_negocio fija requisitos por defecto"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Reglas de integridad",
+      "items": [
+        "empresaId obligatorio y filtrado en cada query",
+        "Índice compuesto {empresaId, _id} por colección",
+        "colaboradores resuelve el N:M usuario-empresa"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Auditoría",
+      "items": [
+        "Toda mutación escribe registro_auditoria",
+        "Guarda usuarioId, acción y timestamp",
+        "Colección de solo anexado, nunca editable"
+      ]
+    }
+  ]
+}

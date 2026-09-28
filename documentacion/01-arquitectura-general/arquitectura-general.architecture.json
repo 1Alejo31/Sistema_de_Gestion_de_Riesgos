@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Sistema de Gestión de Riesgos · Arquitectura general",
+    "quality_profile": "showcase",
+    "viewBox": [1340, 712],
+    "legend": { "mode": "all" },
+    "views": [
+      {
+        "id": "ruta-primaria",
+        "label": "Ruta primaria",
+        "focus": ["cliente", "gateway", "auth", "motor", "mongodb"],
+        "note": "Petición autenticada desde el cliente Flutter hasta el dato persistido del arrendatario."
+      },
+      {
+        "id": "rama-ia",
+        "label": "Rama de IA",
+        "focus": ["motor", "iaOrq", "claude", "openai", "documental"],
+        "note": "Salida controlada hacia los LLM y retorno del borrador al repositorio documental."
+      },
+      {
+        "id": "asincrono",
+        "label": "Procesamiento asíncrono",
+        "focus": ["motor", "cola", "notificaciones", "cliente"],
+        "note": "Eventos del motor que disparan alertas y recordatorios sin bloquear la petición."
+      }
+    ]
+  },
+  "components": [
+    { "id": "cliente", "type": "frontend", "label": "Cliente Flutter", "sublabel": "iOS · Android · Web", "pos": [20, 250], "size": [150, 64] },
+    { "id": "gateway", "type": "cloud", "label": "API Gateway", "sublabel": "Entrada única REST", "tag": "TLS · rate limit", "pos": [260, 250], "size": [150, 64] },
+    { "id": "auth", "type": "security", "label": "Auth Service", "sublabel": "JWT · RBAC", "tag": "tenant_id en claim", "pos": [540, 250], "size": [150, 64] },
+    { "id": "usuarios", "type": "backend", "label": "User Service", "sublabel": "Perfiles y permisos", "pos": [540, 70], "size": [150, 64] },
+    { "id": "empresa", "type": "backend", "label": "Company Service", "sublabel": "Sector y colaboradores", "pos": [850, 70], "size": [170, 64] },
+    { "id": "motor", "type": "backend", "label": "SG-SST Engine", "sublabel": "11 módulos de planificación", "tag": "núcleo de negocio", "pos": [850, 240], "size": [170, 84] },
+    { "id": "reportes", "type": "backend", "label": "Reporting Service", "sublabel": "KPIs · PDF / Excel", "pos": [1140, 70], "size": [150, 64] },
+    { "id": "mongodb", "type": "database", "label": "MongoDB", "sublabel": "Datos compartidos", "pos": [1140, 250], "size": [150, 64] },
+    { "id": "notificaciones", "type": "backend", "label": "Notification Svc", "sublabel": "SendGrid · Twilio", "pos": [260, 420], "size": [150, 64] },
+    { "id": "cola", "type": "messagebus", "label": "RabbitMQ / Redis", "sublabel": "Eventos diferidos", "pos": [540, 420], "size": [150, 64] },
+    { "id": "iaOrq", "type": "backend", "label": "AI Orchestrator", "sublabel": "Enrutado de agentes", "pos": [850, 420], "size": [170, 64] },
+    { "id": "documental", "type": "backend", "label": "Document Service", "sublabel": "Versionado", "tag": "auditoría", "pos": [1140, 420], "size": [150, 64] },
+    { "id": "claude", "type": "external", "label": "Claude API", "sublabel": "Anthropic", "pos": [700, 570], "size": [150, 64] },
+    { "id": "openai", "type": "external", "label": "OpenAI API", "sublabel": "OpenAI", "pos": [900, 570], "size": [150, 64] }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Clúster de microservicios · aislamiento multi-arrendatario",
+      "wraps": ["gateway", "auth", "usuarios", "empresa", "motor", "reportes", "mongodb", "notificaciones", "cola", "iaOrq", "documental"]
+    },
+    { "kind": "security-group", "label": "Integraciones externas de IA", "wraps": ["claude", "openai"] }
+  ],
+  "connections": [
+    { "id": "cliente-gateway", "from": "cliente", "to": "gateway", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "gateway-auth", "from": "gateway", "to": "auth", "label": "valida JWT", "variant": "emphasis" },
+    { "id": "auth-motor", "from": "auth", "to": "motor", "label": "petición autorizada", "variant": "emphasis" },
+    { "id": "motor-mongodb", "from": "motor", "to": "mongodb", "label": "lectura / escritura", "variant": "emphasis" },
+
+    { "id": "auth-usuarios", "from": "auth", "to": "usuarios", "label": "resuelve roles", "fromSide": "top", "toSide": "bottom" },
+    { "id": "empresa-motor", "from": "empresa", "to": "motor", "label": "config. de sector", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "reportes-mongodb", "from": "reportes", "to": "mongodb", "label": "agrega KPIs", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+
+    { "id": "motor-ia", "from": "motor", "to": "iaOrq", "label": "solicita agente", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "ia-claude", "from": "iaOrq", "to": "claude", "label": "HTTPS saliente", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelDy": -24 },
+    { "id": "ia-openai", "from": "iaOrq", "to": "openai", "label": "HTTPS saliente", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "ia-documental", "from": "iaOrq", "to": "documental", "label": "borrador", "fromSide": "right", "toSide": "left" },
+    { "id": "documental-mongodb", "from": "documental", "to": "mongodb", "label": "versión aprobada", "fromSide": "top", "toSide": "bottom" },
+
+    { "id": "motor-cola", "from": "motor", "to": "cola", "label": "publica eventos", "variant": "dashed" },
+    { "id": "cola-notificaciones", "from": "cola", "to": "notificaciones", "label": "consume", "variant": "dashed" },
+    { "id": "notificaciones-cliente", "from": "notificaciones", "to": "cliente", "label": "alerta", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Entrada y acceso",
+      "items": [
+        "Gateway REST con TLS y rate limit",
+        "JWT corto + RBAC; tenant_id en el claim",
+        "User y Company aportan perfil y sector"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Núcleo y datos",
+      "items": [
+        "SG-SST Engine: 11 módulos y validaciones",
+        "MongoDB compartido, particionado por tenant",
+        "Toda mutación deja registro de auditoría"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "IA y asincronía",
+      "items": [
+        "Agente enrutado por sector de negocio",
+        "Claude y OpenAI fuera del límite interno",
+        "La IA se persiste solo tras aprobación"
+      ]
+    }
+  ]
+}

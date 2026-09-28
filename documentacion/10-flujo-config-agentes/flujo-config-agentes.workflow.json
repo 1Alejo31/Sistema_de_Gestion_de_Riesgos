@@ -1,0 +1,235 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Flujo · Configuración de agentes de IA por empresa",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "descubrir",
+        "label": "Agentes disponibles",
+        "focus": [
+          "accede",
+          "lista",
+          "habilita"
+        ],
+        "note": "El catálogo del sector define qué agentes se ofrecen a esa empresa."
+      },
+      {
+        "id": "parametrizar",
+        "label": "Parámetros del modelo",
+        "focus": [
+          "parametros",
+          "guarda"
+        ],
+        "note": "Modelo, temperatura y límite de tokens quedan acotados por la plataforma."
+      },
+      {
+        "id": "aplicar",
+        "label": "Aplicación en runtime",
+        "focus": [
+          "persiste",
+          "aplica"
+        ],
+        "note": "El orquestador lee la configuración de la empresa en cada invocación."
+      }
+    ],
+    "viewBox": [
+      1240,
+      652
+    ]
+  },
+  "lanes": [
+    {
+      "id": "admin",
+      "label": "Administrador de Empresa"
+    },
+    {
+      "id": "companySvc",
+      "label": "Company Service"
+    },
+    {
+      "id": "iaOrq",
+      "label": "AI Orchestrator"
+    },
+    {
+      "id": "datos",
+      "label": "MongoDB"
+    }
+  ],
+  "phases": [
+    {
+      "id": "descubrir",
+      "label": "Descubrir",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "configurar",
+      "label": "Configurar",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "aplicar",
+      "label": "Aplicar",
+      "fromCol": 4,
+      "toCol": 4,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "accede",
+    "lista",
+    "habilita",
+    "parametros",
+    "guarda"
+  ],
+  "nodes": [
+    {
+      "id": "accede",
+      "lane": "admin",
+      "col": 0,
+      "type": "frontend",
+      "label": "Abrir Agentes IA",
+      "sublabel": "sección empresa",
+      "width": 125
+    },
+    {
+      "id": "lista",
+      "lane": "companySvc",
+      "col": 1,
+      "type": "cloud",
+      "label": "Listar agentes",
+      "sublabel": "según sector",
+      "width": 125
+    },
+    {
+      "id": "habilita",
+      "lane": "admin",
+      "col": 2,
+      "type": "frontend",
+      "label": "Habilitar",
+      "sublabel": "activar / apagar",
+      "width": 125
+    },
+    {
+      "id": "parametros",
+      "lane": "admin",
+      "col": 3,
+      "type": "frontend",
+      "label": "Ajustar modelo",
+      "sublabel": "tokens y temp.",
+      "width": 125
+    },
+    {
+      "id": "guarda",
+      "lane": "iaOrq",
+      "col": 4,
+      "type": "security",
+      "label": "Validar límites",
+      "sublabel": "cuota y costo",
+      "width": 125
+    },
+    {
+      "id": "persiste",
+      "lane": "datos",
+      "col": 4,
+      "type": "database",
+      "label": "config_agentes_ia",
+      "sublabel": "por empresaId",
+      "width": 125
+    },
+    {
+      "id": "aplica",
+      "lane": "iaOrq",
+      "col": 5,
+      "type": "backend",
+      "label": "Aplicar en runtime",
+      "sublabel": "cada invocación",
+      "width": 125
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "accede",
+      "to": "lista",
+      "label": "abre sección",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e2",
+      "from": "lista",
+      "to": "habilita",
+      "label": "disponibles",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e3",
+      "from": "habilita",
+      "to": "parametros",
+      "label": "selección",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e4",
+      "from": "parametros",
+      "to": "guarda",
+      "label": "envía config",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e5",
+      "from": "guarda",
+      "to": "persiste",
+      "label": "guarda",
+      "role": "branch"
+    },
+    {
+      "id": "e6",
+      "from": "persiste",
+      "to": "aplica",
+      "label": "lee config",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Agentes configurables",
+      "items": [
+        "Normativo, Peligros, Políticas y Búsqueda",
+        "El catálogo del sector sugiere cuáles activar",
+        "Cada empresa decide su propio conjunto"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Parámetros",
+      "items": [
+        "Modelo destino (Claude u OpenAI)",
+        "Temperatura y límite de tokens por llamada",
+        "Cuota mensual y tope de costo por empresa"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Aislamiento",
+      "items": [
+        "La config vive bajo el empresaId del tenant",
+        "El orquestador nunca mezcla contexto entre empresas",
+        "Un agente apagado no se ofrece en la interfaz"
+      ]
+    }
+  ]
+}

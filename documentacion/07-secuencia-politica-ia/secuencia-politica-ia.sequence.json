@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Secuencia · Crear política SG-SST con IA",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      600
+    ],
+    "column_fit": "spread",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "solicitud",
+        "label": "Solicitud y contexto",
+        "focus": [
+          "gerente",
+          "motor",
+          "iaOrq",
+          "claude"
+        ],
+        "note": "El orquestador inyecta empresa, sector y marco legal antes de invocar al modelo."
+      },
+      {
+        "id": "guardrails",
+        "label": "Validación automática",
+        "focus": [
+          "iaOrq",
+          "guardrails",
+          "motor"
+        ],
+        "note": "Los guardrails revisan estructura y cumplimiento antes de mostrar el borrador."
+      },
+      {
+        "id": "aprobacion",
+        "label": "Aprobación humana",
+        "focus": [
+          "gerente",
+          "motor",
+          "docService",
+          "auditoria"
+        ],
+        "note": "Nada se persiste como versión oficial sin la aprobación del Gerente SG-SST."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "gerente",
+      "type": "external",
+      "label": "Gerente SG-SST",
+      "sublabel": "Flutter"
+    },
+    {
+      "id": "motor",
+      "type": "backend",
+      "label": "SG-SST Engine",
+      "sublabel": "POST /policies"
+    },
+    {
+      "id": "iaOrq",
+      "type": "backend",
+      "label": "AI Orchestrator",
+      "sublabel": "routing agentes"
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude API",
+      "sublabel": "Agente Políticas"
+    },
+    {
+      "id": "guardrails",
+      "type": "security",
+      "label": "Guardrails",
+      "sublabel": "validación salida"
+    },
+    {
+      "id": "docService",
+      "type": "backend",
+      "label": "Document Service",
+      "sublabel": "versionado"
+    },
+    {
+      "id": "auditoria",
+      "type": "database",
+      "label": "Auditoría",
+      "sublabel": "registro"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 255,
+      "label": "Solicitud y contexto"
+    },
+    {
+      "from": 262,
+      "to": 340,
+      "label": "Guardrails"
+    },
+    {
+      "from": 348,
+      "to": 520,
+      "label": "Aprobación y versionado"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "gerente",
+      "to": "motor",
+      "y": 165,
+      "label": "crear política (construcción)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "motor",
+      "to": "iaOrq",
+      "y": 195,
+      "label": "solicita Agente de Políticas"
+    },
+    {
+      "id": "m3",
+      "from": "iaOrq",
+      "to": "claude",
+      "y": 225,
+      "label": "prompt + contexto empresa",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m4",
+      "from": "claude",
+      "to": "iaOrq",
+      "y": 253,
+      "label": "borrador generado",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "iaOrq",
+      "to": "guardrails",
+      "y": 283,
+      "label": "valida estructura",
+      "variant": "security"
+    },
+    {
+      "id": "m6",
+      "from": "guardrails",
+      "to": "iaOrq",
+      "y": 311,
+      "label": "cumple política",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "iaOrq",
+      "to": "motor",
+      "y": 339,
+      "label": "borrador validado",
+      "variant": "return"
+    },
+    {
+      "id": "m8",
+      "from": "motor",
+      "to": "gerente",
+      "y": 367,
+      "label": "muestra para revisión",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "gerente",
+      "to": "motor",
+      "y": 400,
+      "label": "aprueba versión",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m10",
+      "from": "motor",
+      "to": "docService",
+      "y": 428,
+      "label": "crea versión v1"
+    },
+    {
+      "id": "m11",
+      "from": "docService",
+      "to": "auditoria",
+      "y": 456,
+      "label": "registra cambio",
+      "variant": "dashed"
+    },
+    {
+      "id": "m12",
+      "from": "docService",
+      "to": "motor",
+      "y": 484,
+      "label": "v1 publicada",
+      "variant": "return"
+    },
+    {
+      "id": "m13",
+      "from": "motor",
+      "to": "gerente",
+      "y": 512,
+      "label": "201 política activa",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "motor",
+      "from": 160,
+      "to": 518,
+      "type": "backend"
+    },
+    {
+      "participant": "iaOrq",
+      "from": 190,
+      "to": 345,
+      "type": "backend"
+    },
+    {
+      "participant": "claude",
+      "from": 220,
+      "to": 259,
+      "type": "external"
+    },
+    {
+      "participant": "guardrails",
+      "from": 278,
+      "to": 317,
+      "type": "security"
+    },
+    {
+      "participant": "docService",
+      "from": 423,
+      "to": 490,
+      "type": "backend"
+    },
+    {
+      "participant": "auditoria",
+      "from": 451,
+      "to": 462,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Inyección de contexto",
+      "items": [
+        "Sector, tamaño y país",
+        "Marco legal vigente",
+        "Versiones previas"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Guardrails",
+      "items": [
+        "Estructura mínima exigida",
+        "Cubre requisitos obligatorios",
+        "Exige firma de dirección"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Aprobación humana",
+      "items": [
+        "La IA no persiste sola",
+        "El Gerente aprueba o devuelve",
+        "Auditoría guarda autor y fecha"
+      ]
+    }
+  ]
+}

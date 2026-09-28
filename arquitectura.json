@@ -1,0 +1,27 @@
+﻿{
+  "meta": {
+    "locale": "es",
+    "animation": "trace",
+    "visual_preset": "blueprint"
+  },
+  "components": [
+    {"id": "gateway", "name": "API Gateway", "group": "frontend"},
+    {"id": "auth", "name": "Servicio Autenticación", "group": "servicios"},
+    {"id": "users", "name": "Servicio Usuarios", "group": "servicios"},
+    {"id": "empresa", "name": "Servicio Empresa", "group": "servicios"},
+    {"id": "sgsst", "name": "Motor SG-SST", "group": "servicios"},
+    {"id": "ia", "name": "Orquestador IA", "group": "servicios"},
+    {"id": "docs", "name": "Gestión Documental", "group": "servicios"},
+    {"id": "reports", "name": "Servicio Reportes", "group": "servicios"},
+    {"id": "mongodb", "name": "MongoDB", "group": "datos"},
+    {"id": "claude", "name": "Claude API", "group": "externos"}
+  ],
+  "relationships": [
+    {"source": "gateway", "target": "auth"},
+    {"source": "gateway", "target": "users"},
+    {"source": "auth", "target": "mongodb"},
+    {"source": "users", "target": "mongodb"},
+    {"source": "sgsst", "target": "mongodb"},
+    {"source": "ia", "target": "claude"}
+  ]
+}

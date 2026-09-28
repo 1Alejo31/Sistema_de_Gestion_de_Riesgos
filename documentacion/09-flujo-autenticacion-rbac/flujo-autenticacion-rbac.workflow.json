@@ -1,0 +1,252 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Flujo · Autenticación JWT y control RBAC",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "login",
+        "label": "Inicio de sesión",
+        "focus": [
+          "login",
+          "validaClave",
+          "generaJWT",
+          "guardaToken"
+        ],
+        "note": "La credencial se verifica con bcrypt y el token nace con roles y tenant."
+      },
+      {
+        "id": "peticion",
+        "label": "Petición autorizada",
+        "focus": [
+          "peticion",
+          "verifica",
+          "autoriza"
+        ],
+        "note": "Cada llamada revalida firma, vigencia, rol y pertenencia al arrendatario."
+      },
+      {
+        "id": "denegado",
+        "label": "Rutas de rechazo",
+        "focus": [
+          "rechazoLogin",
+          "rechazoRol"
+        ],
+        "note": "401 por credencial o token; 403 cuando el rol no cubre el recurso."
+      }
+    ],
+    "viewBox": [
+      1240,
+      652
+    ]
+  },
+  "lanes": [
+    {
+      "id": "cliente",
+      "label": "Cliente Flutter"
+    },
+    {
+      "id": "authSvc",
+      "label": "Auth Service"
+    },
+    {
+      "id": "gateway",
+      "label": "API Gateway"
+    },
+    {
+      "id": "recurso",
+      "label": "Microservicio destino"
+    }
+  ],
+  "mainPath": [
+    "login",
+    "validaClave",
+    "generaJWT",
+    "guardaToken",
+    "peticion",
+    "verifica",
+    "autoriza"
+  ],
+  "nodes": [
+    {
+      "id": "login",
+      "lane": "cliente",
+      "col": 0,
+      "type": "frontend",
+      "label": "Login",
+      "sublabel": "email + clave",
+      "width": 118
+    },
+    {
+      "id": "validaClave",
+      "lane": "authSvc",
+      "col": 1,
+      "type": "security",
+      "label": "Validar clave",
+      "sublabel": "bcrypt",
+      "width": 118
+    },
+    {
+      "id": "generaJWT",
+      "lane": "authSvc",
+      "col": 2,
+      "type": "security",
+      "label": "Generar JWT",
+      "sublabel": "roles + tenant",
+      "width": 118
+    },
+    {
+      "id": "guardaToken",
+      "lane": "cliente",
+      "col": 3,
+      "type": "database",
+      "label": "Guardar token",
+      "sublabel": "secure storage",
+      "width": 118
+    },
+    {
+      "id": "peticion",
+      "lane": "cliente",
+      "col": 4,
+      "type": "frontend",
+      "label": "Llamar API",
+      "sublabel": "Bearer token",
+      "width": 118
+    },
+    {
+      "id": "verifica",
+      "lane": "gateway",
+      "col": 5,
+      "type": "cloud",
+      "label": "Verificar JWT",
+      "sublabel": "firma y vigencia",
+      "width": 118
+    },
+    {
+      "id": "autoriza",
+      "lane": "recurso",
+      "col": 5,
+      "type": "backend",
+      "label": "Autorizar rol",
+      "sublabel": "RBAC + tenant",
+      "width": 118
+    },
+    {
+      "id": "rechazoLogin",
+      "lane": "authSvc",
+      "col": 3,
+      "type": "external",
+      "label": "401",
+      "sublabel": "credencial mala",
+      "width": 118
+    },
+    {
+      "id": "rechazoRol",
+      "lane": "recurso",
+      "col": 4,
+      "type": "external",
+      "label": "403",
+      "sublabel": "rol insuficiente",
+      "width": 118
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "login",
+      "to": "validaClave",
+      "label": "credenciales",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e2",
+      "from": "validaClave",
+      "to": "generaJWT",
+      "label": "correcta",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e3",
+      "from": "generaJWT",
+      "to": "guardaToken",
+      "label": "access token",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e4",
+      "from": "guardaToken",
+      "to": "peticion",
+      "label": "adjunta",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e5",
+      "from": "peticion",
+      "to": "verifica",
+      "label": "Authorization",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e6",
+      "from": "verifica",
+      "to": "autoriza",
+      "label": "claims ok",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e7",
+      "from": "validaClave",
+      "to": "rechazoLogin",
+      "label": "inválida",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "e8",
+      "from": "autoriza",
+      "to": "rechazoRol",
+      "label": "sin permiso",
+      "variant": "security",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Contenido del JWT",
+      "items": [
+        "sub, empresaId y roles[] del colaborador",
+        "Vigencia corta con refresh token aparte",
+        "Firma verificada en cada microservicio"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Middleware RBAC",
+      "items": [
+        "Compara recurso y acción contra permisos[]",
+        "Rechaza si el empresaId no coincide",
+        "401 por identidad, 403 por autorización"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Endurecimiento",
+      "items": [
+        "Rate limit y CORS en el API Gateway",
+        "Bloqueo por intentos_fallidos consecutivos",
+        "Todo el tráfico va sobre HTTPS"
+      ]
+    }
+  ]
+}

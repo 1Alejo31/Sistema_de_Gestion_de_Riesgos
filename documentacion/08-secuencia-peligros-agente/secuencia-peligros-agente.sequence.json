@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Secuencia · Identificar peligros con Agente de Peligros",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      600
+    ],
+    "column_fit": "spread",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "solicitud",
+        "label": "Selección de actividad",
+        "focus": [
+          "gerente",
+          "motor",
+          "iaOrq"
+        ],
+        "note": "El Gerente elige proceso y actividad; el motor arma el contexto del sector."
+      },
+      {
+        "id": "sugerencia",
+        "label": "Sugerencia del agente",
+        "focus": [
+          "iaOrq",
+          "claude",
+          "guardrails"
+        ],
+        "note": "El agente propone peligros típicos y los guardrails validan la taxonomía."
+      },
+      {
+        "id": "validacion",
+        "label": "Validación humana",
+        "focus": [
+          "gerente",
+          "motor",
+          "matriz",
+          "auditoria"
+        ],
+        "note": "Solo los peligros aceptados por el Gerente entran en la matriz."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "gerente",
+      "type": "external",
+      "label": "Gerente SG-SST",
+      "sublabel": "Flutter"
+    },
+    {
+      "id": "motor",
+      "type": "backend",
+      "label": "SG-SST Engine",
+      "sublabel": "POST /hazards"
+    },
+    {
+      "id": "iaOrq",
+      "type": "backend",
+      "label": "AI Orchestrator",
+      "sublabel": "routing agentes"
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude API",
+      "sublabel": "Agente Peligros"
+    },
+    {
+      "id": "guardrails",
+      "type": "security",
+      "label": "Guardrails",
+      "sublabel": "taxonomía GTC 45"
+    },
+    {
+      "id": "matriz",
+      "type": "database",
+      "label": "matriz_peligros",
+      "sublabel": "colección"
+    },
+    {
+      "id": "auditoria",
+      "type": "database",
+      "label": "Auditoría",
+      "sublabel": "registro"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 210,
+      "label": "Selección"
+    },
+    {
+      "from": 215,
+      "to": 325,
+      "label": "Sugerencia del agente"
+    },
+    {
+      "from": 332,
+      "to": 520,
+      "label": "Validación y guardado"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "gerente",
+      "to": "motor",
+      "y": 165,
+      "label": "selecciona proceso y actividad",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m2",
+      "from": "motor",
+      "to": "iaOrq",
+      "y": 195,
+      "label": "solicita Agente de Peligros"
+    },
+    {
+      "id": "m3",
+      "from": "iaOrq",
+      "to": "claude",
+      "y": 225,
+      "label": "sector + actividad + histórico",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m4",
+      "from": "claude",
+      "to": "iaOrq",
+      "y": 253,
+      "label": "peligros sugeridos",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "iaOrq",
+      "to": "guardrails",
+      "y": 283,
+      "label": "valida taxonomía",
+      "variant": "security"
+    },
+    {
+      "id": "m6",
+      "from": "guardrails",
+      "to": "iaOrq",
+      "y": 311,
+      "label": "ordena por severidad",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "iaOrq",
+      "to": "motor",
+      "y": 339,
+      "label": "lista normalizada",
+      "variant": "return"
+    },
+    {
+      "id": "m8",
+      "from": "motor",
+      "to": "gerente",
+      "y": 367,
+      "label": "propone para validar",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "gerente",
+      "to": "motor",
+      "y": 400,
+      "label": "acepta / descarta",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m10",
+      "from": "motor",
+      "to": "matriz",
+      "y": 428,
+      "label": "guarda solo aceptados"
+    },
+    {
+      "id": "m11",
+      "from": "motor",
+      "to": "auditoria",
+      "y": 456,
+      "label": "registra decisión",
+      "variant": "dashed"
+    },
+    {
+      "id": "m12",
+      "from": "motor",
+      "to": "gerente",
+      "y": 490,
+      "label": "201 matriz actualizada",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "motor",
+      "from": 160,
+      "to": 496,
+      "type": "backend"
+    },
+    {
+      "participant": "iaOrq",
+      "from": 190,
+      "to": 345,
+      "type": "backend"
+    },
+    {
+      "participant": "claude",
+      "from": 220,
+      "to": 259,
+      "type": "external"
+    },
+    {
+      "participant": "guardrails",
+      "from": 278,
+      "to": 317,
+      "type": "security"
+    },
+    {
+      "participant": "matriz",
+      "from": 423,
+      "to": 434,
+      "type": "database"
+    },
+    {
+      "participant": "auditoria",
+      "from": 451,
+      "to": 462,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Contexto del agente",
+      "items": [
+        "peligros_tipicos[] del sector",
+        "Proceso y actividad elegidos",
+        "Peligros ya registrados"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Guardrails",
+      "items": [
+        "Normaliza a taxonomía vigente",
+        "Descarta duplicados",
+        "Ordena por severidad"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Decisión humana",
+      "items": [
+        "Sugiere; el Gerente decide",
+        "Solo se guardan los aceptados",
+        "Queda en registro_auditoria"
+      ]
+    }
+  ]
+}

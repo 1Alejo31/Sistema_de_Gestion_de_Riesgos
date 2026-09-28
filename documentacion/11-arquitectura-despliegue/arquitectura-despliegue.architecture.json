@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura de despliegue · contenedores y puertos",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1340,
+      590
+    ],
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "borde",
+        "label": "Borde y enrutado",
+        "focus": [
+          "cliente",
+          "gateway",
+          "authC",
+          "companyC"
+        ],
+        "note": "Un único punto de entrada TLS delante de la red interna de contenedores."
+      },
+      {
+        "id": "datos",
+        "label": "Persistencia y cola",
+        "focus": [
+          "motorC",
+          "mongo",
+          "rabbit"
+        ],
+        "note": "Driver directo a MongoDB y publicación asíncrona en la cola de mensajes."
+      },
+      {
+        "id": "ia",
+        "label": "Salida a proveedores de IA",
+        "focus": [
+          "iaC",
+          "claude",
+          "openai"
+        ],
+        "note": "Solo el contenedor orquestador tiene egreso permitido hacia Internet."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "cliente",
+      "type": "frontend",
+      "label": "Cliente Flutter",
+      "sublabel": "iOS · Android · Web",
+      "pos": [
+        40,
+        70
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "gateway",
+      "type": "cloud",
+      "label": "API Gateway",
+      "sublabel": "Nginx · :443",
+      "tag": "TLS · rate limit",
+      "pos": [
+        300,
+        70
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "mongo",
+      "type": "database",
+      "label": "MongoDB",
+      "sublabel": "replica set",
+      "tag": ":27017",
+      "pos": [
+        840,
+        70
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "rabbit",
+      "type": "messagebus",
+      "label": "RabbitMQ",
+      "sublabel": "colas durables",
+      "tag": ":5672",
+      "pos": [
+        1120,
+        70
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "authC",
+      "type": "security",
+      "label": "auth-service",
+      "sublabel": "contenedor · :3001",
+      "pos": [
+        40,
+        250
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "userC",
+      "type": "backend",
+      "label": "user-service",
+      "sublabel": "contenedor · :3002",
+      "pos": [
+        300,
+        250
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "companyC",
+      "type": "backend",
+      "label": "company-service",
+      "sublabel": "contenedor · :3003",
+      "pos": [
+        560,
+        250
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "motorC",
+      "type": "backend",
+      "label": "sgsst-engine",
+      "sublabel": "contenedor · :3004",
+      "pos": [
+        840,
+        250
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "iaC",
+      "type": "backend",
+      "label": "ai-orchestrator",
+      "sublabel": "contenedor · :3005",
+      "pos": [
+        1120,
+        250
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "reportC",
+      "type": "backend",
+      "label": "reporting-service",
+      "sublabel": "contenedor · :3007",
+      "pos": [
+        300,
+        430
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "notifC",
+      "type": "backend",
+      "label": "notification-svc",
+      "sublabel": "contenedor · :3008",
+      "pos": [
+        40,
+        430
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "docC",
+      "type": "backend",
+      "label": "document-service",
+      "sublabel": "contenedor · :3006",
+      "pos": [
+        560,
+        430
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude API",
+      "sublabel": "Anthropic",
+      "pos": [
+        840,
+        430
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "openai",
+      "type": "external",
+      "label": "OpenAI API",
+      "sublabel": "OpenAI",
+      "pos": [
+        1120,
+        430
+      ],
+      "size": [
+        170,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Red interna de contenedores · sin exposición pública",
+      "wraps": [
+        "authC",
+        "userC",
+        "companyC",
+        "motorC",
+        "iaC",
+        "reportC",
+        "notifC",
+        "docC",
+        "mongo",
+        "rabbit"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Egreso permitido solo desde ai-orchestrator",
+      "wraps": [
+        "claude",
+        "openai"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "cliente-gateway",
+      "from": "cliente",
+      "to": "gateway",
+      "label": "HTTPS :443",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gateway-auth",
+      "from": "gateway",
+      "to": "authC",
+      "label": "REST :3001",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gateway-company",
+      "from": "gateway",
+      "to": "companyC",
+      "label": "REST :3003"
+    },
+    {
+      "id": "company-motor",
+      "from": "companyC",
+      "to": "motorC",
+      "label": "REST :3004",
+      "variant": "emphasis"
+    },
+    {
+      "id": "motor-ia",
+      "from": "motorC",
+      "to": "iaC",
+      "label": "REST :3005",
+      "variant": "emphasis",
+      "labelDy": 44,
+      "labelDx": -22
+    },
+    {
+      "id": "motor-mongo",
+      "from": "motorC",
+      "to": "mongo",
+      "label": "driver :27017",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "motor-rabbit",
+      "from": "motorC",
+      "to": "rabbit",
+      "label": "AMQP :5672",
+      "variant": "dashed"
+    },
+    {
+      "id": "motor-doc",
+      "from": "motorC",
+      "to": "docC",
+      "label": "REST :3006"
+    },
+    {
+      "id": "user-notif",
+      "from": "userC",
+      "to": "notifC",
+      "label": "REST :3008"
+    },
+    {
+      "id": "company-report",
+      "from": "companyC",
+      "to": "reportC",
+      "label": "REST :3007"
+    },
+    {
+      "id": "ia-claude",
+      "from": "iaC",
+      "to": "claude",
+      "label": "HTTPS",
+      "variant": "security"
+    },
+    {
+      "id": "ia-openai",
+      "from": "iaC",
+      "to": "openai",
+      "label": "HTTPS",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Contenedores",
+      "items": [
+        "Una imagen por servicio, sin estado local",
+        "Escalado horizontal por réplicas del servicio",
+        "Health check y reinicio automático por pod"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Comunicación",
+      "items": [
+        "Síncrona REST/HTTP entre servicios internos",
+        "Asíncrona por RabbitMQ para alertas y IA",
+        "Solo el gateway acepta tráfico externo"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Observabilidad",
+      "items": [
+        "Cada contenedor envía logs al stack central",
+        "Métricas por servicio expuestas en /metrics",
+        "Trazas correlacionadas por requestId"
+      ]
+    }
+  ]
+}

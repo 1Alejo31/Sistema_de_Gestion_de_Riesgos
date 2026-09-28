@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Flujo · Creación de usuario con perfil",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "alta",
+        "label": "Alta y validación",
+        "focus": [
+          "ingresa",
+          "valida",
+          "asignaRol"
+        ],
+        "note": "El Admin captura los datos y el User Service valida unicidad antes de asignar rol."
+      },
+      {
+        "id": "credencial",
+        "label": "Credencial e invitación",
+        "focus": [
+          "claveTemp",
+          "invitacion",
+          "acepta"
+        ],
+        "note": "La clave temporal expira; el usuario define la suya al aceptar la invitación."
+      },
+      {
+        "id": "rechazo",
+        "label": "Datos inválidos",
+        "focus": [
+          "valida",
+          "rechazo"
+        ],
+        "note": "El email duplicado o el documento inválido detienen el alta sin crear registro."
+      }
+    ],
+    "viewBox": [
+      1240,
+      652
+    ]
+  },
+  "lanes": [
+    {
+      "id": "admin",
+      "label": "Administrador de Empresa"
+    },
+    {
+      "id": "userSvc",
+      "label": "User Service"
+    },
+    {
+      "id": "notif",
+      "label": "Notification Service"
+    },
+    {
+      "id": "invitado",
+      "label": "Usuario invitado"
+    }
+  ],
+  "mainPath": [
+    "ingresa",
+    "valida",
+    "asignaRol",
+    "claveTemp",
+    "invitacion",
+    "acepta"
+  ],
+  "nodes": [
+    {
+      "id": "ingresa",
+      "lane": "admin",
+      "col": 0,
+      "type": "frontend",
+      "label": "Ingresar datos",
+      "sublabel": "nombre · email",
+      "width": 110
+    },
+    {
+      "id": "valida",
+      "lane": "userSvc",
+      "col": 1,
+      "type": "backend",
+      "label": "Validar datos",
+      "sublabel": "email único",
+      "width": 110
+    },
+    {
+      "id": "asignaRol",
+      "lane": "userSvc",
+      "col": 2,
+      "type": "security",
+      "label": "Asignar rol",
+      "sublabel": "RBAC + empresa",
+      "width": 110
+    },
+    {
+      "id": "claveTemp",
+      "lane": "userSvc",
+      "col": 3,
+      "type": "security",
+      "label": "Clave temporal",
+      "sublabel": "hash + caducidad",
+      "width": 110
+    },
+    {
+      "id": "invitacion",
+      "lane": "notif",
+      "col": 4,
+      "type": "messagebus",
+      "label": "Enviar correo",
+      "sublabel": "SendGrid",
+      "width": 110
+    },
+    {
+      "id": "acepta",
+      "lane": "invitado",
+      "col": 5,
+      "type": "frontend",
+      "label": "Definir clave",
+      "sublabel": "activa cuenta",
+      "width": 110
+    },
+    {
+      "id": "auditoria",
+      "lane": "userSvc",
+      "col": 5,
+      "type": "database",
+      "label": "Auditar alta",
+      "sublabel": "usuario + fecha",
+      "width": 110
+    },
+    {
+      "id": "rechazo",
+      "lane": "admin",
+      "col": 2,
+      "type": "external",
+      "label": "Rechazar alta",
+      "sublabel": "sin registro",
+      "width": 110
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "ingresa",
+      "to": "valida",
+      "label": "envía",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e2",
+      "from": "valida",
+      "to": "asignaRol",
+      "label": "válido",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e3",
+      "from": "asignaRol",
+      "to": "claveTemp",
+      "label": "rol fijado",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e4",
+      "from": "claveTemp",
+      "to": "invitacion",
+      "label": "token",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e5",
+      "from": "invitacion",
+      "to": "acepta",
+      "label": "enlace",
+      "variant": "emphasis",
+      "role": "main"
+    },
+    {
+      "id": "e6",
+      "from": "valida",
+      "to": "rechazo",
+      "label": "duplicado",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "e7",
+      "from": "acepta",
+      "to": "auditoria",
+      "label": "registra",
+      "variant": "dashed",
+      "role": "async"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Validaciones",
+      "items": [
+        "Email único dentro de la plataforma",
+        "Documento con formato del país de la empresa",
+        "El rol debe existir en el catálogo RBAC"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Credenciales",
+      "items": [
+        "Clave temporal con bcrypt y caducidad corta",
+        "El enlace de invitación es de un solo uso",
+        "La cuenta queda inactiva hasta aceptar"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Auditoría",
+      "items": [
+        "Se registra quién creó y con qué rol",
+        "El alta fallida no deja usuario huérfano",
+        "Cambios de rol posteriores también se auditan"
+      ]
+    }
+  ]
+}

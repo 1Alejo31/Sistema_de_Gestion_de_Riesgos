@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Flutter · Clean Architecture y entidades de dominio",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1340,
+      715
+    ],
+    "legend": {
+      "mode": "all"
+    },
+    "views": [
+      {
+        "id": "capas",
+        "label": "Flujo entre capas",
+        "focus": [
+          "apiRemote",
+          "models",
+          "repoImpl",
+          "repoContract",
+          "useCases",
+          "providers"
+        ],
+        "note": "Del datasource remoto al provider: cada capa depende solo de la interfaz de la siguiente."
+      },
+      {
+        "id": "dominio",
+        "label": "Entidades de dominio",
+        "focus": [
+          "userEntity",
+          "collaboratorEntity",
+          "companyEntity",
+          "policyEntity"
+        ],
+        "note": "Entidades puras, sin serialización ni dependencias de framework."
+      },
+      {
+        "id": "riesgo",
+        "label": "Cadena de riesgo",
+        "focus": [
+          "companyEntity",
+          "hazardEntity",
+          "riskEntity"
+        ],
+        "note": "Peligro identificado y su valoración de riesgo dentro del dominio."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "apiRemote",
+      "type": "cloud",
+      "label": "RemoteDatasource",
+      "sublabel": "Dio · REST + JWT",
+      "pos": [
+        40,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "localCache",
+      "type": "database",
+      "label": "LocalDatasource",
+      "sublabel": "Hive · SharedPrefs",
+      "pos": [
+        300,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "repoContract",
+      "type": "backend",
+      "label": "Repository",
+      "sublabel": "contrato abstracto",
+      "tag": "domain",
+      "pos": [
+        560,
+        60
+      ],
+      "size": [
+        180,
+        70
+      ]
+    },
+    {
+      "id": "useCases",
+      "type": "backend",
+      "label": "UseCases",
+      "sublabel": "una operación cada uno",
+      "tag": "domain",
+      "pos": [
+        840,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "pages",
+      "type": "frontend",
+      "label": "Pages",
+      "sublabel": "Login · Dashboard",
+      "pos": [
+        1120,
+        60
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "models",
+      "type": "database",
+      "label": "Models",
+      "sublabel": "fromJson / toJson",
+      "tag": "data",
+      "pos": [
+        40,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "repoImpl",
+      "type": "backend",
+      "label": "RepositoryImpl",
+      "sublabel": "implementa contrato",
+      "tag": "data",
+      "pos": [
+        300,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "userEntity",
+      "type": "backend",
+      "label": "UserEntity",
+      "sublabel": "email · rol · empresa",
+      "pos": [
+        560,
+        230
+      ],
+      "size": [
+        180,
+        70
+      ]
+    },
+    {
+      "id": "collaboratorEntity",
+      "type": "backend",
+      "label": "CollaboratorEntity",
+      "sublabel": "cargo · departamento",
+      "pos": [
+        840,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "providers",
+      "type": "frontend",
+      "label": "Providers",
+      "sublabel": "Riverpod · GetX",
+      "pos": [
+        1120,
+        230
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "companyEntity",
+      "type": "backend",
+      "label": "CompanyEntity",
+      "sublabel": "razonSocial · sector",
+      "pos": [
+        560,
+        400
+      ],
+      "size": [
+        180,
+        70
+      ]
+    },
+    {
+      "id": "policyEntity",
+      "type": "backend",
+      "label": "PolicyEntity",
+      "sublabel": "version · estado",
+      "pos": [
+        840,
+        400
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "widgets",
+      "type": "frontend",
+      "label": "Widgets",
+      "sublabel": "RiskMatrix · UserCard",
+      "pos": [
+        1120,
+        400
+      ],
+      "size": [
+        170,
+        70
+      ]
+    },
+    {
+      "id": "hazardEntity",
+      "type": "backend",
+      "label": "HazardEntity",
+      "sublabel": "tipo · severidad",
+      "pos": [
+        560,
+        570
+      ],
+      "size": [
+        180,
+        70
+      ]
+    },
+    {
+      "id": "riskEntity",
+      "type": "backend",
+      "label": "RiskEntity",
+      "sublabel": "probabilidad · impacto",
+      "pos": [
+        840,
+        570
+      ],
+      "size": [
+        170,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Data layer",
+      "wraps": [
+        "apiRemote",
+        "localCache",
+        "models",
+        "repoImpl"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Domain layer · sin dependencias de framework",
+      "wraps": [
+        "repoContract",
+        "useCases",
+        "userEntity",
+        "collaboratorEntity",
+        "companyEntity",
+        "policyEntity",
+        "hazardEntity",
+        "riskEntity"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Presentation layer",
+      "wraps": [
+        "pages",
+        "providers",
+        "widgets"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "api-models",
+      "from": "apiRemote",
+      "to": "models",
+      "label": "deserializa",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "local-repo",
+      "from": "localCache",
+      "to": "repoImpl",
+      "label": "caché offline",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "models-repo",
+      "from": "models",
+      "to": "repoImpl",
+      "label": "mapea a entidad",
+      "variant": "emphasis"
+    },
+    {
+      "id": "repo-contract",
+      "from": "repoImpl",
+      "to": "repoContract",
+      "label": "implementa",
+      "variant": "emphasis"
+    },
+    {
+      "id": "contract-usecases",
+      "from": "repoContract",
+      "to": "useCases",
+      "label": "inyecta",
+      "variant": "emphasis"
+    },
+    {
+      "id": "usecases-providers",
+      "from": "useCases",
+      "to": "providers",
+      "label": "expone estado",
+      "variant": "emphasis"
+    },
+    {
+      "id": "providers-pages",
+      "from": "providers",
+      "to": "pages",
+      "label": "observa",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "providers-widgets",
+      "from": "providers",
+      "to": "widgets",
+      "label": "reconstruye",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "user-collab",
+      "from": "userEntity",
+      "to": "collaboratorEntity",
+      "label": "1 : N"
+    },
+    {
+      "id": "collab-company",
+      "from": "collaboratorEntity",
+      "to": "companyEntity",
+      "label": "N : 1"
+    },
+    {
+      "id": "company-policy",
+      "from": "companyEntity",
+      "to": "policyEntity",
+      "label": "1 : N",
+      "labelDy": 20
+    },
+    {
+      "id": "company-hazard",
+      "from": "companyEntity",
+      "to": "hazardEntity",
+      "label": "1 : N",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "hazard-risk",
+      "from": "hazardEntity",
+      "to": "riskEntity",
+      "label": "1 : N",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Regla de dependencia",
+      "items": [
+        "Presentation depende de Domain, nunca de Data",
+        "Domain no importa Dio, Hive ni Flutter",
+        "Data implementa los contratos del dominio"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Serialización",
+      "items": [
+        "Model extiende Entity y añade fromJson",
+        "La entidad viaja pura hacia los usecases",
+        "El error de red se mapea a Failure tipado"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Estructura de carpetas",
+      "items": [
+        "features/<modulo>/{data,domain,presentation}",
+        "core/ aloja red, DI, errores y utilidades",
+        "Un usecase por operación de negocio"
+      ]
+    }
+  ]
+}
