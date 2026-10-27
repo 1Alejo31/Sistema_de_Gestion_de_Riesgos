@@ -1,0 +1,5 @@
+{
+  "upstreamOrigin": "http://3.148.192.204",
+  "frontendOrigin": "http://localhost:8090",
+  "proxyPort": 8091
+}
